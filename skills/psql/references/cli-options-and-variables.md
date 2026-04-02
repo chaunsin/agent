@@ -186,9 +186,23 @@ psql maintains internal variables that control behavior. Set with `\set`, unset 
 | `SINGLELINE` | `on` or `off`. Newline acts as query terminator. |
 | `SINGLESTEP` | `on` or `off`. Confirm before each command. |
 | `SQLSTATE` | SQLSTATE error code from the last query. |
-| `STDIN_FILENOING` | `on` or `off`. Echo stdin to stderr (useful for `psql -f -`). |
+| `WATCH_INTERVAL` | Default interval (seconds) for `\watch` command (default: 2). |
 | `USER` | Current database user. Set automatically on connect. |
 | `VERBOSITY` | `default`, `verbose`, `terse`, `sqlstate`. Controls error message detail level. |
+
+### SQL Interpolation
+
+psql variables can be interpolated into SQL statements using colon-prefixed syntax. This is **plain text substitution**, not parameterized queries — understand the differences to use it safely.
+
+| Syntax | Behavior | Example |
+|--------|----------|---------|
+| `:varname` | Unquoted substitution. The variable's value replaces `:varname` literally, which can break SQL syntax or enable injection if the value contains special characters. | `\set table users` → `SELECT * FROM :table;` → `SELECT * FROM users;` |
+| `:'varname'` | Single-quoted string substitution. The value is placed inside single quotes, with any embedded single quotes and backslashes escaped. This is the safest form for values. | `\set name O'Brien` → `SELECT * FROM users WHERE name = :'name';` → `SELECT * FROM users WHERE name = 'O''Brien';` |
+| `:"varname"` | Double-quoted identifier substitution. The value is placed inside double quotes, with embedded double quotes doubled. Use this for table/column names. | `\set col first name` → `SELECT :"col" FROM users;` → `SELECT "first name" FROM users;` |
+| `:{?varname}` | Variable existence test. Expands to the literal string `TRUE` if the variable is defined, `FALSE` otherwise. Designed for use in `\if` conditions. | `\if :{?myvar}` → true if `myvar` was set |
+| `\:varname` | Escaped colon. The colon is not treated as a variable reference — `:varname` is passed through literally. | `SELECT \:not_a_var FROM t;` → `SELECT :not_a_var FROM t;` |
+
+**Safety guidance**: Always prefer `:'varname'` (quoted string) over `:varname` (unquoted) when substituting user-provided values. Unquoted substitution can break SQL syntax or enable injection. For the safest programmatic parameter passing, use `\bind` with the extended query protocol (which provides true parameterized queries).
 
 ### Key Variables for Scripting
 
@@ -256,6 +270,7 @@ INSERT INTO unique_table (id) VALUES (1);
 | `%%` | Literal `%` |
 | `%:varname:` | Value of psql variable |
 | `%`[command]`` | Output of shell command |
+| `%P` | Pipeline status. Shows the number of pending results in pipeline mode, empty string otherwise. |
 | `%\n` | Newline |
 | `%\t` | Tab |
 
@@ -304,6 +319,7 @@ INSERT INTO unique_table (id) VALUES (1);
 | `PSQL_HISTORY` | Alternative history file path (overrides `HISTFILE`) |
 | `PSQLRC` | Alternative `.psqlrc` location |
 | `PSQL_PAGER` | Pager command (overrides `PAGER`) |
+| `PSQL_WATCH_PAGER` | Pager command specifically for `\watch` output (overrides `PSQL_PAGER` and `PAGER` when set). Useful for configuring different pager behavior for repeated query output. |
 | `EDITOR` / `VISUAL` | Editor for `\e`, `\ef`, `\ev` |
 | `SHELL` | Shell for `\!` |
 | `TMPDIR` | Temp directory for temp files |

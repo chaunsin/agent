@@ -225,7 +225,38 @@ FROM generate_series('2024-01-01'::date, '2024-12-01'::date, '1 month') AS d;
 \gexec
 ```
 
-### Store and Reuse Results with \gset
+### Backquote Expansion (Shell Command Substitution)
+
+Text inside backquotes (`` ` ``) in meta-command arguments is executed as a shell command, and the output replaces the backquoted text. This lets you inject dynamic values from the OS into psql:
+
+```sql
+-- Inject current date into a variable
+\set report_date `date +%Y-%m-%d`
+\echo :report_date
+-- outputs: 2026-04-02
+
+-- Use shell output in a file path
+\o /tmp/query_output_`date +%Y%m%d_%H%M%S`.csv
+SELECT * FROM users;
+\o
+
+-- Show system information
+\echo 'Running as user: ' `whoami`
+\echo 'Hostname: ' `hostname`
+
+-- Use shell arithmetic
+\set batch_size `echo 1000`
+SELECT * FROM users LIMIT :batch_size;
+
+-- Combine with \setenv for dynamic configuration
+\setenv PAGER `which less`
+```
+
+**Limitations**:
+- Backquote expansion is NOT performed inside single-quoted strings
+- Not performed in lines skipped by `\if`/`\else`/`\elif`
+- Not performed in `\copy` arguments (the entire line is taken literally)
+- Variable references inside backquotes are NOT expanded — backquotes execute in the shell, not psql
 
 ```sql
 -- Get table count and use it

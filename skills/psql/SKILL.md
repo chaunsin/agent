@@ -10,6 +10,7 @@ description: >
   configuration and customization. Even if the user doesn't explicitly say "psql" but is working
   with PostgreSQL from the command line, this skill is relevant.
 ---
+
 # psql — PostgreSQL Interactive Terminal
 
 psql is PostgreSQL's feature-rich interactive terminal. It lets you write and execute queries, inspect database objects, import/export data, script batch operations, and customize output formatting — all from the command line.
@@ -75,9 +76,17 @@ psql -h localhost -U postgres -d mydb   # no password prompt
 psql -f script.sql dbname                        # execute file then exit
 psql -c "SELECT 1" dbname                        # run single command then exit
 psql -1 -f migration.sql dbname                  # run in single transaction
+
+# 6. Service connection (reads from pg_service.conf)
+psql service=mydb_prod
+
+# 7. Reconnect within a session
+\c dbname                                       # reconnect to different db
+\c -reuse-previous=on sslmode=require           # change only sslmode
+\c "host=newhost port=5432 dbname=mydb"         # conninfo string
 ```
 
-Key flags: `-h` host, `-p` port, `-U` user, `-d` database, `-w` no password prompt, `-W` force password prompt.
+Key flags: `-h` host, `-p` port, `-U` user, `-d` database, `-w` no password prompt, `-W` force password prompt, `-A` unaligned output, `-L` log file.
 
 **Precedence**: CLI flags > environment variables > ~/.pgpass > defaults. Use `~/.pgpass` instead of `PGPASSWORD` in production — `PGPASSWORD` is visible in process listings.
 
@@ -88,20 +97,21 @@ Key flags: `-h` host, `-p` port, `-U` user, `-d` database, `-w` no password prom
 | `\d`            | All tables, views, materialized views, sequences, foreign tables (equiv.`\dtvmsE`) |
 | `\dP`           | Partitioned tables                                                                   |
 | `\dt`           | Tables only                                                                          |
-| `\dv`           | Views only                                                                           |
+| `\dv`           | Views only                                                                          |
 | `\di`           | Indexes only                                                                         |
 | `\ds`           | Sequences only                                                                       |
 | `\dm`           | Materialized views only                                                              |
-| `\de`           | Foreign tables only                                                                  |
+| `\de`           | Foreign servers                                                                      |
+| `\det`          | Foreign tables (mnemonic: "external tables")                                       |
 | `\dT`           | Data types                                                                           |
-| `\df`           | Functions                                                                            |
+| `\df`           | Functions (use modifiers: `a`=aggregate, `n`=normal, `p`=procedure, `t`=trigger, `w`=window) |
 | `\da`           | Aggregate functions                                                                  |
 | `\dn`           | Schemas                                                                              |
 | `\du` / `\dg` | Roles                                                                                |
 | `\db`           | Tablespaces                                                                          |
 | `\dc`           | Conversions                                                                          |
 | `\dD`           | Domains                                                                              |
-| `\dl`           | Large objects                                                                        |
+| `\dl`           | Large objects (alias for `\lo_list`)                                               |
 | `\dF`           | Text search configurations                                                           |
 | `\dFd`          | Text search dictionaries                                                             |
 | `\dFp`          | Text search parsers                                                                  |
@@ -110,16 +120,17 @@ Key flags: `-h` host, `-p` port, `-U` user, `-d` database, `-w` no password prom
 | `\deu`          | User mappings                                                                        |
 | `\dew`          | Foreign-data wrappers                                                                |
 | `\dp`           | Privileges (GRANT/REVOKE)                                                            |
-| `\l`            | List databases                                                                       |
+| `\drds`         | Per-role and per-database configuration settings                                     |
+| `\l`            | List databases (accepts pattern: `\l test*`)                                       |
 
 | `\dA`           | Access methods                                           |
 | `\dAc` / `\dAf` / `\dAo` / `\dAp` | Operator classes, families, operators, support functions |
 | `\dC`           | Type casts                                               |
-| `\dconfig`      | Server configuration parameters                          |
+| `\dconfig`      | Server configuration parameters (`\dconfig *` for all)  |
 | `\dd`           | Object descriptions (comments)                           |
 | `\ddp`          | Default privileges                                       |
 | `\dL`           | Procedural languages                                     |
-| `\do`           | Operators                                                |
+| `\do`           | Operators (accepts arg type patterns)                    |
 | `\dO`           | Collations                                               |
 | `\dP[itn]`      | Partitioned tables (`t`=tables, `i`=indexes, `n`=nested) |
 | `\drg`          | Granted role memberships                                 |
@@ -143,7 +154,7 @@ Provide a name for details: `\d table_name` shows columns, types, indexes, const
 
 - `*` = any sequence of characters, `?` = single character
 - `.` separates schema from object: `\dt public.*` or `\dt my_schema.users`
-- `..` separates database.schema.object: `\dt mydb.public.*`
+- `..` separates database.schema.object: `\dt mydb.public.*` (db must match current db)
 - Double quotes stop case folding and wildcard expansion: `\dt "FOO"` matches `FOO` not `foo`
 - `$` is matched literally (not regex anchor)
 - Regex chars like `[0-9]` work: `\dt user[0-9]*` matches `user1`, `user2`
@@ -157,12 +168,16 @@ Provide a name for details: `\d table_name` shows columns, types, indexes, const
 | `\gx`               | Execute with expanded output (like `\g`, forces `\x on`) |
 | `\g filename`       | Execute and send output to file                              |
 | `\g \| command`      | Execute and pipe output to shell command                     |
+| `\g (format=csv,footer=off) file` | Execute with one-shot formatting options        |
 | `\gdesc`            | Describe result columns without executing                    |
 | `\gset [prefix]`    | Execute and store results in psql variables                  |
 | `\gexec`            | Execute each cell of result as a SQL command                 |
 | `\crosstabview`     | Display result as crosstab (pivot table)                     |
 | `\watch`            | Re-execute query periodically (see below)                    |
 | `\bind [params...]` | Use extended query protocol with parameters                  |
+| `\bind_named stmt_name [params...]` | Bind named prepared statement                    |
+| `\parse stmt_name`  | Create prepared statement from current query buffer          |
+| `\close_prepared stmt_name` | Close a prepared statement                           |
 | `\;`                | Append semicolon to buffer without executing                 |
 
 ### Data Import/Export
@@ -176,6 +191,9 @@ COPY table FROM '/path/file.csv' WITH (FORMAT csv, HEADER true);
 \copy table TO '/path/file.csv' WITH (FORMAT csv, HEADER true)
 \copy table FROM '/path/file.csv' WITH (FORMAT csv, HEADER true)
 \copy (SELECT ...) TO '/path/output.csv' WITH (FORMAT csv, HEADER true)
+
+-- Advanced: specific columns, NULL handling, custom delimiter
+\copy table (col1, col2) FROM 'data.csv' WITH (FORMAT csv, HEADER true, NULL 'N/A')
 ```
 
 `\copy` is the go-to for day-to-day work — it uses the client's filesystem and permissions, not the server's.
@@ -199,13 +217,35 @@ WARNING: The `program` option executes a shell command. If constructed from user
 \x                  Toggle expanded display (vertical vs table)
 \t                  Toggle tuples only (no headers/footers)
 \pset format FORMAT  Set output format: aligned, asciidoc, csv, html, latex, latex-longtable, troff-ms, unaligned, wrapped
-\pset border N       Set border style (0-2)
+\pset border N       Set border style (0-2; 3 for latex data-row lines)
 \pset null STRING    Display NULL as STRING
 \pset pager [off]    Control pager usage
 \pset title 'TEXT'   Set table title
 \pset recordsep SEP  Set record separator for unaligned mode
+\pset fieldsep SEP   Set field separator for unaligned mode (default: |)
+\pset footer [on|off] Toggle row count footer
+\pset columns N      Set target width for wrapped format
+\pset csv_fieldsep C  Set CSV field separator (default: comma)
+\pset numericlocale [on|off]  Toggle locale-specific number formatting
+\pset linestyle STYLE Set border style: ascii, old-ascii, unicode
+\pset pager_min_lines N  Minimum lines before pager activates
+\pset xheader_width MODE  Expanded header width: full, column, page, or N
 \H                   Toggle HTML output (shortcut)
+\C [title]           Set table title (shortcut for \pset title)
+\f [string]          Set field separator (shortcut for \pset fieldsep)
+\T table_options     Set HTML table attributes (shortcut for \pset tableattr)
 ```
+
+### Large Objects
+
+```
+\lo_import filename [comment]   Import file as large object, returns OID
+\lo_export loid filename        Export large object to file
+\lo_list[x+]                    List all large objects
+\lo_unlink loid                 Delete large object
+```
+
+Large object OIDs are persistent references. Always associate a human-readable comment on import. Use `\lo_list` to find OIDs.
 
 ### Scripting & Control Flow
 
@@ -215,13 +255,17 @@ WARNING: The `program` option executes a shell command. If constructed from user
 \o [filename]       Redirect query output to file (or pipe with |cmd)
 \o                   Stop output redirection
 \qecho TEXT          Output text to redirected output
-\echo TEXT           Output text to stdout
+\echo TEXT           Output text to stdout (-n suppresses trailing newline)
 \warn TEXT           Output text to stderr
 \! command           Execute shell command
 \cd [dir]            Change working directory
 \set NAME VALUE      Set psql variable
 \unset NAME          Unset psql variable
 \prompt [TEXT] NAME  Prompt user for variable value
+\getenv psql_var env_var   Copy environment variable into psql variable
+\setenv name [value]       Set or unset environment variable
+\p                  Print current query buffer
+\w filename         Write query buffer to file (or pipe with |cmd)
 
 -- Conditional execution (useful in scripts)
 \if EXPR
@@ -252,6 +296,11 @@ Variables in SQL: `:'varname'` (quoted string), `:'varname'::type` (with cast), 
 \s [FILE]            Print command history (or save to file)
 \restrict KEY        Enter restricted mode (only \unrestrict allowed)
 \unrestrict KEY      Exit restricted mode
+\timing [on\|off]    Toggle query execution time display (milliseconds)
+\errverbose          Repeat last error at maximum verbosity
+\? [topic]           Help: commands, options, or variables
+\h [command]         SQL syntax help (use * for all: \h *)
+\copyright           Show PostgreSQL copyright
 ```
 
 ### Pipeline Mode (PostgreSQL 14+)
@@ -263,17 +312,22 @@ Variables in SQL: `:'varname'` (quoted string), `:'varname'::type` (with cast), 
 \endpipeline
 ```
 
-Pipelines batch multiple queries into a single network round trip, reducing latency for many small queries.
+Pipeline mode sends multiple queries in a single network round trip, reducing latency.
+
+**Pipeline commands:**
+- `\startpipeline` — begin pipeline block
+- `\endpipeline` — end pipeline block
+- `\sendpipeline` — append current query buffer to pipeline without waiting
+- `\syncpipeline` — send sync message without ending pipeline
+- `\flushrequest` — request server flush without sync
+- `\flush` — manually push unsent data to server
+- `\getresults [N]` — read pending results (N=0 means all)
 
 **Pipeline limitations:**
 - `COPY` is not supported in pipeline mode
 - Meta-commands like `\g`, `\gx`, `\gdesc` are not allowed inside a pipeline
 - All queries use the extended query protocol
-
-**Advanced pipeline commands:**
-- `\flushrequest` — request server flush without sync
-- `\flush` — manually push unsent data to server
-- `\getresults [N]` — read pending results (N=0 means all)
+- Use `\bind`, `\bind_named`, `\parse`, or `\close_prepared` within pipelines
 
 ### \watch Syntax
 
@@ -293,6 +347,15 @@ SELECT * FROM pg_stat_activity WHERE state = 'active';
 SELECT count(*) FROM queue WHERE status = 'pending';
 \watch i=1 min_rows=1            -- every 1s, stop when queue is empty
 ```
+
+### Exit Codes
+
+| Code | Meaning |
+| ---- | ------- |
+| 0    | Successful completion |
+| 1    | A fatal error occurred (server error, connection failure, etc.) |
+| 2    | Connection failed (could not connect to the server) |
+| 3    | Script execution ended due to ON_ERROR_STOP |
 
 ## Security Considerations
 
@@ -356,6 +419,10 @@ The `:'varname'` form (quoted) is always safer than `:varname` (unquoted), becau
 | Pivot query results           | `SELECT ... \crosstabview`                                   |
 | Script with conditional logic | `\if :var ... \endif`                                        |
 | Batch-insert many rows        | Use `\startpipeline` / `\endpipeline`                      |
+| SQL syntax help               | `\h CREATE TABLE`                                            |
+| psql command help             | `\? commands`                                                |
+| Check query execution time    | `\timing on` then run query                                   |
+| Debug error details           | `\errverbose`                                                 |
 
 ## Reference Files
 
