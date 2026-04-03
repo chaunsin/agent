@@ -65,13 +65,15 @@ export PGDATABASE=mydb
 export PGUSER=postgres
 # WARNING: PGPASSWORD is visible in process listings (e.g. `ps aux`).
 #          Use ~/.pgpass in production instead.
-export PGPASSWORD=<secret>
+export PGPASSWORD=YOUR_PASSWORD
 psql                       # picks up all params from env
 
 # 4. ~/.pgpass file (RECOMMENDED for passwords)
 #    Format: hostname:port:database:username:password
 touch ~/.pgpass && chmod 600 ~/.pgpass
-echo "localhost:5432:mydb:postgres:YOUR_PASSWORD" >> ~/.pgpass
+# Then manually edit ~/.pgpass and add entries (avoids password in shell history):
+# hostname:port:database:username:password
+# Example: localhost:5432:mydb:postgres:YOUR_PASSWORD
 psql -h localhost -U postgres -d mydb   # no password prompt
 
 # 5. Execute and exit
@@ -457,6 +459,35 @@ The `:'varname'` form (quoted) is always safer than `:varname` (unquoted), becau
 - **`references/cli-options-and-variables.md`** — All CLI flags, environment variables, and psql internal variables (AUTOCOMMIT, ON_ERROR_STOP, ECHO, etc.). Refer to this when configuring psql startup behavior or writing scripts that depend on variable state.
 - **`references/tips-workflows.md`** — Practical workflows, pattern matching examples, scripting patterns, and data import/export patterns. Useful when translating a task into the right sequence of psql commands.
 - **`references/tips-advanced.md`** — Performance tips, debugging/introspection, safety best practices, and common gotchas. Consult this for lock analysis, query plan inspection, and troubleshooting.
+
+## Important Notes
+
+Behavior
+
+### SQL Comment Handling
+
+psql handles two comment styles differently:
+
+- **C-style block comments** (`/* ... */`): Passed to the server for processing and removal.
+- **SQL-standard comments** (`--`): Removed by psql itself, before sending to the server.
+
+This distinction matters when writing scripts that rely on comment behavior — only SQL-standard comments are stripped client-side.
+
+### Variable Variables (Soft References)
+
+psql allows indirect variable references through `\set`:
+
+```sql
+\set foo 'my_table'
+\set bar :foo         -- copies the value of foo into bar
+\echo :bar            -- outputs: my_table
+```
+
+While constructs like `\set :foo 'something'` are syntactically valid, they produce "soft links" that have limited practical use. For straightforward variable copying, use `\set new_var :old_var`.
+
+### Version Compatibility
+
+psql works best with servers of the same or an older major version. Backslash commands (especially `\d` family) may fail with newer server versions. When connecting to multiple server versions, use the newest available psql client. The `\d` commands generally work with servers back to version 9.2.
 
 ## External References
 

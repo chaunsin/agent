@@ -208,9 +208,10 @@ Changes the password for the specified user (default: current user). Prompts for
 Sends the current query buffer to the server for execution.
 
 - Without arguments: equivalent to a semicolon
-- With a filename: output written to file (only if the query succeeds and returns data)
-- With `|command`: output piped to shell command (no variable interpolation in command). Only written if the query succeeds.
-**Note**: The file or command is written to only if the query successfully returns zero or more tuples — not if the query fails or is a non-data-returning SQL command.
+- With a filename: output written to file (only if the query succeeds and returns zero or more tuples)
+- With `|command`: output piped to shell command (no variable interpolation in command). Only written if the query succeeds and returns zero or more tuples.
+
+**Note**: The file or command is written to only if the query successfully returns zero or more tuples — not if the query fails or is a non-data-returning SQL command. This means even an empty result set (0 rows) will trigger output.
 
 ```sql
 SELECT * FROM users \g (format=csv,footer=off) /tmp/users.csv
@@ -356,7 +357,7 @@ Deletes the large object with the specified OID.
 
 Reads and executes input from the file. Relative to current working directory. Use `-` for stdin.
 
-**stdin behavior**: When using `\i -`, psql reads from standard input until EOF. Note that Readline editing is not available when reading from stdin. If `\i -` is used inside a file being processed (nested inclusion), it reads from the parent's input stream — use with caution in scripts.
+**stdin behavior**: When using `\i -`, psql reads from standard input until an EOF indication or `\q` meta-command. This can be used to intersperse interactive input with input from files. Note that Readline editing is only available at the outermost level — it is not active when reading from a nested file.
 
 ### `\ir` / `\include_relative` filename
 
