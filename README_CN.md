@@ -42,6 +42,18 @@ npx skills add chaunsin/agent -g
 
 # 安装到指定 agent
 npx skills add chaunsin/agent -a claude-code -a cursor
+
+# 检查已安装的 skills 是否有更新
+npx skills check
+
+# 更新所有已安装 skills 到最新版本
+npx skills update
+
+# 列出所有已安装的 skills（项目 + 全局）
+npx skills list
+
+# 移除指定 skill
+npx skills remove psql
 ```
 
 ### 手动安装

@@ -42,6 +42,18 @@ npx skills add chaunsin/agent -g
 
 # Install to specific agents
 npx skills add chaunsin/agent -a claude-code -a cursor
+
+# Check if any installed skills have updates
+npx skills check
+
+# Update all installed skills to the latest version
+npx skills update
+
+# List all installed skills (project + global)
+npx skills list
+
+# Remove a specific skill
+npx skills remove psql
 ```
 
 ### Manual
