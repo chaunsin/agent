@@ -20,8 +20,6 @@ Each skill lives in its own directory under `skills/<name>/` and consists of:
 | [postgresql-cli][postgresql-cli] | [PostgreSQL](https://www.postgresql.org/docs/current/app-psql.html) interactive terminal (psql) reference — meta-commands, CLI options, formatting, data import/export, scripting, and advanced workflows |
 | [rclone-cli][rclone-cli]         | [Rclone](https://rclone.org/) cloud storage manager reference — sync, copy, mount, serve, bisync, crypt, filtering, bandwidth control, and 70+ cloud provider configurations                              |
 
-[postgresql-cli]: skills/postgresql-cli/SKILL.md
-[rclone-cli]: skills/rclone-cli/SKILL.md
 ## Installation
 
 ### npx skills (Recommended)
@@ -30,19 +28,19 @@ The [skills CLI](https://github.com/vercel-labs/skills) is a universal installer
 
 ```bash
 # Install all skills from this repo
-npx skills add chaunsin/agent
+npx skills add chaunsin/agent-skills
 
 # Install a specific skill
-npx skills add chaunsin/agent --skill postgresql-cli
+npx skills add chaunsin/agent-skills--skill postgresql-cli
 
 # List available skills before installing
-npx skills add chaunsin/agent --list
+npx skills add chaunsin/agent-skills--list
 
 # Install globally (available across all projects)
-npx skills add chaunsin/agent -g
+npx skills add chaunsin/agent-skills -g
 
 # Install to specific agents
-npx skills add chaunsin/agent -a claude-code -a cursor
+npx skills add chaunsin/agent-skills -a claude-code -a cursor
 
 # Check if any installed skills have updates
 npx skills check
@@ -73,7 +71,7 @@ For example, with the postgresql-cli skill installed, asking "how to list all ta
 ## Repository Structure
 
 ```text
-agent/
+agent-skills/
 ├── skills/                  # Skill directories
 │   ├── postgresql-cli/      # PostgreSQL interactive terminal (psql)
 │   │   ├── SKILL.md         # Skill entry point
@@ -90,3 +88,6 @@ agent/
 ## License
 
 [Apache License 2.0](LICENSE)
+
+[postgresql-cli]: skills/postgresql-cli/SKILL.md
+[rclone-cli]: skills/rclone-cli/SKILL.md
