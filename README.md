@@ -15,14 +15,13 @@ Each skill lives in its own directory under `skills/<name>/` and consists of:
 
 ## Available Skills
 
-| Skill                          | Description                                                                                                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [postgresql-cli][]             | PostgreSQL interactive terminal (psql) reference — meta-commands, CLI options, formatting, data import/export, scripting, and advanced workflows                            |
-| [rclone-cli][]                 | Rclone cloud storage manager reference — sync, copy, mount, serve, bisync, crypt, filtering, bandwidth control, and 70+ cloud provider configurations                      |
+| Skill                            | Description                                                                                                                                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [postgresql-cli][postgresql-cli] | [PostgreSQL](https://www.postgresql.org/docs/current/app-psql.html) interactive terminal (psql) reference — meta-commands, CLI options, formatting, data import/export, scripting, and advanced workflows |
+| [rclone-cli][rclone-cli]         | [Rclone](https://rclone.org/) cloud storage manager reference — sync, copy, mount, serve, bisync, crypt, filtering, bandwidth control, and 70+ cloud provider configurations                              |
 
 [postgresql-cli]: skills/postgresql-cli/SKILL.md
 [rclone-cli]: skills/rclone-cli/SKILL.md
-
 ## Installation
 
 ### npx skills (Recommended)
