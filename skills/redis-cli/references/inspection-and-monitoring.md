@@ -9,6 +9,7 @@
 - [RDB Backup](#rdb-backup)
 - [Replica Mode](#replica-mode)
 - [LRU Simulation](#lru-simulation)
+- [Slow Log](#slow-log)
 
 ## INFO Command
 
@@ -254,3 +255,55 @@ Output shows hit/miss rates:
 ```
 
 Use this to find the right `maxmemory` value for your key count and access pattern (80-20 power law distribution). A miss rate >10% usually means more memory is needed.
+
+## Slow Log
+
+The slow log records commands that exceed a configured execution time threshold. This is the first tool to reach for when debugging unexplained latency.
+
+### Configuration
+
+```bash
+# Check current slowlog settings
+redis-cli CONFIG GET slowlog*
+
+# slowlog-log-slower-than: threshold in microseconds (negative = disabled)
+# slowlog-max-len: maximum number of entries to keep (ring buffer)
+redis-cli CONFIG SET slowlog-log-slower-than 10000   # 10ms
+redis-cli CONFIG SET slowlog-max-len 128
+```
+
+### Querying
+
+```bash
+# Get recent slow log entries (default: 10)
+redis-cli SLOWLOG GET
+redis-cli SLOWLOG GET 20              # Last 20 entries
+
+# Each entry format:
+# 1) id            — unique entry ID
+# 2) timestamp     — Unix timestamp
+# 3) duration      — execution time in microseconds
+# 4) command       — array: [cmd, arg1, arg2, ...]
+# 5) client        — client address:port
+# 6) client_name   — client name (via CLIENT SETNAME)
+
+# Get entry count
+redis-cli SLOWLOG LEN
+
+# Reset (clear all entries)
+redis-cli SLOWLOG RESET
+```
+
+### Useful SLOWLOG Queries
+
+```bash
+# Find slowest commands
+redis-cli SLOWLOG GET 50 | grep -E "^\d+\)|^\d+\) \(integer\)"
+
+# Monitor slow log continuously
+redis-cli -r -1 -i 10 SLOWLOG GET 5
+
+# Combine with LATENCY for deeper analysis
+redis-cli LATENCY LATEST
+redis-cli SLOWLOG GET 10
+```

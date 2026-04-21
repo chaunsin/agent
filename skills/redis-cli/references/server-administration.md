@@ -6,6 +6,9 @@
 - [Client Management](#client-management)
 - [Configuration](#configuration)
 - [Replication Acknowledgment](#replication-acknowledgment)
+- [Persistence](#persistence)
+- [Replication](#replication)
+- [Server Lifecycle](#server-lifecycle)
 
 ## ACL Management
 
@@ -261,3 +264,100 @@ Parameters:
 - `numlocal` — required local AOF fsync count (0 = don't wait for local)
 - `numreplicas` — required replica AOF fsync count (0 = don't wait for replicas)
 - `timeout` — milliseconds (0 = wait forever)
+
+## Persistence
+
+### RDB Snapshots
+
+```bash
+# Background save (non-blocking, forks a child process)
+redis-cli BGSAVE
+# Background saving started
+
+# Synchronous save (blocks the server — avoid in production)
+redis-cli SAVE
+
+# Check last save time
+redis-cli LASTSAVE
+# (integer) 1735689600
+
+# Check save progress
+redis-cli INFO persistence | grep rdb_last_save_time
+```
+
+### AOF Persistence
+
+```bash
+# Rewrite AOF in background (compact the append-only file)
+redis-cli BGREWRITEAOF
+# Background append only file rewriting started
+
+# Check AOF status
+redis-cli INFO persistence | grep aof_enabled
+
+# Force AOF rewrite via config
+redis-cli CONFIG SET appendonly yes
+redis-cli CONFIG SET appendfsync everysec    # always|everysec|no
+```
+
+### Persistence Configuration
+
+```bash
+# RDB save schedule: save after N seconds if at least M keys changed
+redis-cli CONFIG GET save
+redis-cli CONFIG SET save "900 1 300 10 60 10000"
+
+# AOF settings
+redis-cli CONFIG GET appendonly
+redis-cli CONFIG GET appendfsync
+redis-cli CONFIG GET auto-aof-rewrite-percentage
+```
+
+## Replication
+
+### Configure Replication
+
+```bash
+# Make current instance a replica of another Redis
+redis-cli REPLICAOF host port
+# OK
+
+# Promote replica back to master
+redis-cli REPLICAOF NO ONE
+# OK
+
+# Check replication status
+redis-cli INFO replication
+redis-cli ROLE
+```
+
+### Replication Info
+
+```bash
+redis-cli INFO replication | grep -E "role|connected_slaves|master_repl_offset"
+```
+
+## Server Lifecycle
+
+### Shutdown
+
+```bash
+# Save and shutdown (blocks until complete)
+redis-cli SHUTDOWN NOSAVE|SAVE
+
+# Shutdown with save (default if not specified)
+redis-cli SHUTDOWN SAVE
+
+# Shutdown without saving
+redis-cli SHUTDOWN NOSAVE
+
+# Check if server is responding
+redis-cli PING
+```
+
+### Failover (Redis 7.0+)
+
+```bash
+# Coordinated failover via sentinel-like mechanism
+redis-cli FAILOVER [TO host port [FORCE]] [ABORT] [TIMEOUT milliseconds]
+```

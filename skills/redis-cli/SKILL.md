@@ -11,10 +11,12 @@ description: >
   database administration from CLI, Redis cluster operations (--cluster, CLUSTER NODES,
   CLUSTER INFO), ACL user management (ACL SETUSER, ACL LIST), client management (CLIENT LIST,
   CLIENT KILL), configuration (CONFIG GET, CONFIG SET), replication acknowledgment (WAIT,
-  WAITAOF), mass data import/export, RDB backup, CSV/JSON output, or any Redis operation
-  performed from a terminal. Use even if the user doesn't explicitly say "redis-cli" — any
-  task that reads, writes, scans, or manages data in Redis from the command line is a match
-  for this skill.
+  WAITAOF), persistence (SAVE, BGSAVE, BGREWRITEAOF), replication setup (REPLICAOF),
+  slow query analysis (SLOWLOG), mass data import/export, RDB backup, CSV/JSON output,
+  probabilistic data structures (Bloom filter BF.*, Cuckoo filter CF.*, Top-K, Count-Min Sketch,
+  T-Digest), or any Redis operation performed from a terminal. Use even if the user doesn't
+  explicitly say "redis-cli" — any task that reads, writes, scans, or manages data in Redis
+  from the command line is a match for this skill.
 metadata:
   author: chaunsin
   version: "0.1"
@@ -288,6 +290,24 @@ redis-cli CONFIG RESETSTAT                            # Reset INFO counters
 redis-cli WAIT 2 5000                                 # Wait for 2 replicas (5s timeout)
 redis-cli WAITAOF 1 1 5000                            # Wait for AOF fsync (Redis 7.2+)
 
+# Persistence
+redis-cli BGSAVE                                      # Background RDB save
+redis-cli BGREWRITEAOF                                # Background AOF rewrite
+redis-cli LASTSAVE                                    # Last save timestamp
+
+# Replication
+redis-cli REPLICAOF host port                         # Become replica
+redis-cli REPLICAOF NO ONE                            # Promote to master
+
+# Server lifecycle
+redis-cli SHUTDOWN SAVE                               # Save and stop
+redis-cli SHUTDOWN NOSAVE                             # Stop without saving
+
+# Slow log
+redis-cli SLOWLOG GET 10                              # Recent slow commands
+redis-cli SLOWLOG LEN                                 # Entry count
+redis-cli SLOWLOG RESET                               # Clear entries
+
 # Cluster management
 redis-cli --cluster check host:port                   # Check cluster health
 redis-cli --cluster reshard host:port                 # Move slots between nodes
@@ -299,11 +319,12 @@ redis-cli -c -h cluster-node PING                     # Cluster-aware connection
 | File | Content | When to read |
 |------|---------|-------------|
 | `references/connection-and-options.md` | Full connection options, CLI flags, SSL/TLS, environment variables, interactive mode features (completion, history, preferences), RESP protocol versions | Configuring connections, setting up TLS, customizing CLI behavior |
-| `references/data-query-commands.md` | Complete command reference for all data types: Strings, Hashes, Lists, Sets, Sorted Sets, Streams, Bitmaps, HyperLogLog, Geospatial, JSON, Vector Sets, with syntax, complexity, and behavioral notes | Looking up specific command syntax, understanding command options and return values |
+| `references/data-query-commands.md` | Core data type commands: Strings, Hashes, Lists, Sets, Sorted Sets, Streams, Bitmaps, HyperLogLog, Geospatial, plus Key Operations, Database Operations, and Transactions | Looking up core command syntax, understanding command options and return values |
+| `references/module-data-types.md` | Module data types: JSON (RedisJSON), Vector Sets (Redis 8.0+), Bloom Filter, Cuckoo Filter, Top-K, Count-Min Sketch, T-Digest — with full command syntax and behavioral notes | Working with Redis module data types, similarity search, probabilistic data structures |
 | `references/key-management.md` | SCAN family details (SCAN/SSCAN/HSCAN/ZSCAN), big keys analysis (--bigkeys, --memkeys, --keystats), key expiration (EXPIRE, TTL, PERSIST), key space patterns, mass insertion | Scanning databases, analyzing key distribution, managing key lifecycles |
 | `references/inspection-and-monitoring.md` | INFO sections, MONITOR, --stat mode, latency tools (--latency, --latency-history, --latency-dist, --intrinsic-latency), RDB backup, replica mode, LRU simulation | Monitoring Redis instances, debugging performance, creating backups |
 | `references/advanced-features.md` | Lua scripting (--eval, --ldb), Pub/Sub mode, pipe mode, CSV/JSON output, string quoting and escaping, get input from stdin, remote RDB transfer, Cluster management (--cluster subcommands, cluster commands) | Running scripts, subscribing to channels, bulk data operations, managing Redis Cluster |
-| `references/server-administration.md` | ACL management (ACL SETUSER/DELUSER/LIST/CAT/GENPASS), client management (CLIENT LIST/KILL/PAUSE/TRACKING), configuration (CONFIG GET/SET/REWRITE), replication acknowledgment (WAIT/WAITAOF) | Managing users and permissions, controlling client connections, runtime configuration, ensuring write durability |
+| `references/server-administration.md` | ACL management (ACL SETUSER/DELUSER/LIST/CAT/GENPASS), client management (CLIENT LIST/KILL/PAUSE/TRACKING), configuration (CONFIG GET/SET/REWRITE), replication acknowledgment (WAIT/WAITAOF), persistence (SAVE/BGSAVE/BGREWRITEAOF), replication setup (REPLICAOF), server lifecycle (SHUTDOWN/FAILOVER) | Managing users and permissions, controlling client connections, runtime configuration, ensuring write durability, persistence management, replication setup |
 
 ## Common Workflows
 
