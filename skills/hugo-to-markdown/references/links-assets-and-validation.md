@@ -10,6 +10,25 @@ For the Hugo docs fixture:
 - `ref` and `relref` appear in docs examples and sometimes in live content
 - the custom link render hook resolves pages, page resources, section resources, and global resources
 - broken-link behavior is controlled by config and local render-hook logic
+- glossary shorthand may appear as a Markdown destination exactly equal to `(g)`
+- fragments may be validated against target headings rather than passed through blindly
+
+### Resolution Order
+
+For the local Hugo docs `render-link.html`, the effective resolution order is:
+
+1. content page
+2. page resource from the current page bundle
+3. section resource from the current section when the page is not a leaf bundle
+4. global resource from `assets`
+
+Implications for conversion:
+
+- do not assume every relative link targets a page
+- do not treat page bundle files and section bundle files as interchangeable
+- do not preserve `/en/` filesystem paths when the site mounts `content/en` to logical `content`
+- preserve query strings and fragments when they still resolve after flattening
+- if fragment validity cannot be confirmed from the local snapshot, keep the fragment but add a note only when there is real ambiguity
 
 When converting:
 
@@ -28,7 +47,24 @@ Check all of these before rewriting image or file references:
 - mounted assets
 - static files
 
+For Hugo repositories, also distinguish:
+
+- leaf bundles versus branch bundles
+- page resources of type `page` versus image, data, document, or video resources
+- resource metadata defined in front matter under `resources`
+
 For this repository's Hugo docs fixture, the link render hook explicitly relies on assets and mounted resources. Read `hugo.toml` and `layouts/_markup/render-link.html` before changing asset paths.
+
+### Bundle-Aware Rules
+
+Use the official page bundle and page resource docs as conversion constraints:
+
+- files next to `index.md` in a leaf bundle can be page resources and may not be rendered as standalone pages
+- files under a branch bundle can be descendant content pages or non-page resources depending on placement
+- section resource lookup is invalid for leaf bundles in the local render-link logic
+- resource `Name`, `Title`, and `params` can come from front matter metadata rather than filename alone
+
+If a shortcode or render hook references a resource, check whether the destination depends on bundle type before flattening the path.
 
 ## Validation Checklist
 

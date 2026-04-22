@@ -1,17 +1,17 @@
 ---
 name: hugo-to-markdown
 description: >
-  Convert Hugo documentation sites and Hugo-managed content into standard Markdown. Use when Codex needs
+  Convert Hugo documentation sites and Hugo-managed content into standard Markdown. Use when Agent needs
   to inspect a local Hugo repository, read hugo.toml or config files, content/, archetypes/, layouts/_shortcodes/,
   layouts/_markup/, and related docs content, then produce Markdown output with Hugo front matter, shortcodes,
-  render hooks, ref/relref links, includes, and asset paths resolved or downgraded safely. This skill is especially
-  useful for Hugo docs migrations, Hugo-to-Markdown exports, and repository-specific conversions where the local
-  Hugo configuration and custom templates define the true rules.
+  render hooks, Markdown attributes, ref/relref links, includes, page bundles, page resources, and asset paths
+  resolved or downgraded safely. This skill is especially useful for Hugo docs migrations, Hugo-to-Markdown exports,
+  and repository-specific conversions where the local Hugo configuration, embedded shortcode rules, and custom
+  templates define the true rules.
 metadata:
   author: chaunsin
   version: "0.2"
 ---
-
 # Hugo To Markdown
 
 ## Overview
@@ -24,6 +24,7 @@ The target output is standard Markdown:
 - Replace or materialize Hugo-only constructs.
 - Preserve meaning when exact rendering is not safely reproducible.
 - Prefer explicit Markdown text over live Hugo template syntax.
+- Distinguish literal Hugo syntax examples from active Hugo features before rewriting anything.
 
 ## Official Basis
 
@@ -31,7 +32,11 @@ Treat the local Hugo docs snapshot as the primary ruleset for the repository und
 
 - `content/en/content-management/shortcodes.md`
 - `content/en/templates/shortcode.md`
-- `content/en/content-management/front-matter.md`
+- `content/en/configuration/front-matter.md`
+- `content/en/configuration/markup.md`
+- `content/en/content-management/page-bundles.md`
+- `content/en/content-management/page-resources.md`
+- `content/en/content-management/markdown-attributes.md`
 - `content/en/render-hooks/*.md`
 - `hugo.toml`
 - `layouts/_shortcodes/*.html`
@@ -72,12 +77,14 @@ Read `references/conversion-workflow.md` before changing files. Then:
 
 1. Resolve the real content root from `hugo.toml`, `config.*`, and module mounts.
 2. Read archetypes to understand expected front matter shape.
-3. Read site data sources in `data/` when shortcodes or partials pull structured content from them.
-4. Read custom shortcode templates in `layouts/_shortcodes/` or `layouts/shortcodes/`.
-5. Read render hooks in `layouts/_markup/`.
-6. Check whether the repo already defines Markdown- or JSON-facing export templates and partials; if it does, use those as evidence for how the site itself downgrades Hugo constructs.
-7. Follow `include`-style shortcodes into referenced content files when the docs site composes content from shared fragments.
-8. Convert one file or one coherent section at a time.
+3. Read the front matter configuration to understand date aliases, fallback order, filename-derived dates, and other inferred metadata.
+4. Read site data sources in `data/` when shortcodes or partials pull structured content from them.
+5. Read custom shortcode templates in `layouts/_shortcodes/` or `layouts/shortcodes/`.
+6. Classify each encountered shortcode as embedded, custom, or inline, then check whether it uses named or positional arguments, block syntax, or self-closing syntax.
+7. Read render hooks in `layouts/_markup/`.
+8. Check whether the repo already defines Markdown- or JSON-facing export templates and partials; if it does, use those as evidence for how the site itself downgrades Hugo constructs.
+9. Follow `include`-style shortcodes into referenced content files when the docs site composes content from shared fragments.
+10. Convert one file or one coherent section at a time.
 
 ### 3. Preserve semantics during conversion
 
@@ -85,26 +92,35 @@ Use these rules by default:
 
 - Keep YAML front matter unless the user explicitly asks for front-matter-free Markdown.
 - Preserve core fields such as `title`, `description`, `date`, `draft`, `aliases`, `slug`, `url`, `weight`, and nested `params` when they still carry meaning.
+- Preserve `publishDate`, `lastmod`, `expiryDate`, and page resource metadata when they still affect meaning or downstream routing.
 - Normalize reserved Hugo front matter keys to their canonical names when the repo mixes casing, for example `Title` to `title`, `Description` to `description`, and `LinkTitle` to `linkTitle`.
+- Account for Hugo front matter aliases and tokens before deciding a field is unused. In the Hugo docs basis this includes aliases such as `pubdate`, `published`, `modified`, and `unpublishdate`, plus tokens such as `:default`, `:filename`, `:fileModTime`, and `:git`.
 - Convert Hugo internal links to normal Markdown links with resolved destinations.
 - Replace Hugo shortcodes with plain Markdown, HTML, or explicit notes only after reading the local shortcode implementation.
+- Preserve or materialize shortcode arguments according to the shortcode's real calling convention. Do not assume every shortcode is named-argument, self-closing, or block-capable.
 - Materialize dynamically generated lists and tables when the shortcode renders content from sections or data files.
 - Leave literal Hugo examples unchanged when the document is documenting Hugo syntax rather than invoking it. This applies both inside fenced code blocks and to escaped forms such as `{{</* foo */>}}` or `{{%/* foo */%}}` that appear in prose, tables, or notation examples.
+- Preserve block attribute semantics such as `{.class #id}` and code-fence attributes when the destination Markdown flavor supports them. If not, downgrade explicitly instead of silently dropping them.
 
 ### 4. Apply Hugo-specific body rules carefully
 
 The Hugo docs repository under `testdata/hugo/docs/` has several important local behaviors:
 
 - `hugo.toml` mounts `content/en` to the logical `content` root, so link and include resolution must use Hugo logical paths instead of preserving `/en/` blindly.
+- The docs basis depends on Hugo front matter configuration for date resolution, aliases, and filename-derived metadata; read `configuration/front-matter.md` and `[frontmatter]` in `hugo.toml` before normalizing dates or slugs.
 - `include` renders another page through `RenderShortcodes`; follow the referenced content file and inline the resulting Markdown.
 - `quick-reference`, `render-list-of-pages-in-section`, and `render-table-of-pages-in-section` generate navigation content from sections; replace them with materialized Markdown lists or tables.
 - `glossary-term`, `glossary`, `get-page-desc`, `module-mounts-note`, `new-in`, and `deprecated-in` expand to prose or badges; convert them into explicit Markdown text or callouts.
 - `code-toggle` may read config snippets and data-backed examples; preserve the underlying code sample, not the UI toggle.
+- `datatable`, `per-lang-config-keys`, `root-configuration-keys`, `syntax-highlighting-styles`, `chroma-lexers`, `newtemplatesystem`, and `hl` are also local shortcodes; inspect their implementations before deciding whether to materialize, flatten, or downgrade.
 - if the repo has data-backed or example-extraction shortcodes such as `features-table`, `optional-features-table`, `clients-example`, or `jupyter-example`, inspect the referenced `data/` files, local example sources, and Markdown-export partials before deciding whether to materialize or downgrade.
 - glossary links can use the special Markdown destination `(g)`; resolve these to stable glossary links instead of leaving the placeholder.
 - `img` and `imgproc` are presentation helpers around page, global, or remote resources; preserve the underlying image reference and caption semantics.
 - `eturl` emits links to embedded template sources; convert to a normal Markdown link if the destination is known, otherwise preserve as a textual note.
+- the local link render hook resolves destinations in this order: content page, page resource, section resource when the page is not a leaf bundle, then global resource. It also validates fragments and glossary shorthand.
 - blockquote and code-block render hooks add alert, file-label, summary, and detail semantics; preserve these semantics in Markdown or explicit notes.
+- embedded `ref` and `relref` are obsolete for Markdown in modern Hugo docs and can interact poorly with the custom link render hook; resolve the final destination instead of preserving the shortcode.
+- the local docs use Markdown attributes and code-fence options that can change rendered output. Keep these semantics when the destination flavor supports them.
 
 Read `references/shortcodes-and-render-hooks.md` before converting any file that contains Hugo syntax.
 
@@ -142,8 +158,11 @@ Use these facts when the local Hugo docs fixture is the input:
 - `hugo.toml` mounts `content/en` to `content`, so English docs are the active content tree.
 - Goldmark passthrough delimiters are configured for math, so `$$...$$`, `\\(...\\)`, and `\\[...\\]` can be meaningful content, not junk.
 - `markup.goldmark.parser.attribute.block = true`, so block attribute syntax may appear after fenced blocks and other block elements.
-- The repo uses custom render hooks for blockquotes, code blocks, links, passthrough, and tables.
+- `markup.goldmark.parser.wrapStandAloneImageWithinParagraph = false`, so standalone image attributes can target the image itself rather than a wrapping paragraph.
+- The repo defines custom render hooks for blockquotes, code blocks, links, passthrough, and tables. It documents heading and image render hooks, but this fixture does not override them locally.
 - The repo uses many shared `_common` fragments referenced through `% include %`, so reading a page file alone is not enough to understand the rendered content.
+- The repo documents embedded, custom, and inline shortcodes, and the conversion logic must distinguish them before flattening syntax.
+- The repo uses page bundles and page resources heavily in examples and render-hook resolution, including section resources and mounted global resources.
 - The repo contains many escaped shortcode examples such as `{{</* foo */>}}` and `{{%/* foo */%}}`; these are documentation samples and must remain literal when they appear inside code examples, notation tables, or tutorial prose.
 
 ## Safety Rules

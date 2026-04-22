@@ -33,6 +33,46 @@ If the repository mixes casing for reserved Hugo fields, normalize to the docume
 
 Apply this normalization before using front matter to build lists, tables, or link labels. Preserve unknown custom keys with their original spelling unless the user asks for a schema rewrite.
 
+## Effective Value Rules
+
+Do not treat front matter as a flat key-value copy problem. In Hugo, some visible values are inferred from configuration, aliases, filenames, or Git metadata.
+
+For the Hugo docs basis, check `configuration/front-matter.md` and the local `[frontmatter]` config before deciding which value is authoritative.
+
+Important alias rules:
+
+- `publishDate` can come from `publishdate`, `pubdate`, or `published`
+- `lastmod` can come from `lastmod` or `modified`
+- `expiryDate` can come from `expirydate` or `unpublishdate`
+
+Important token rules:
+
+- `:default` means Hugo falls back through the documented default date sequence
+- `:filename` can derive `date` and sometimes `slug` from a date-prefixed filename
+- `:fileModTime` can supply a date from the file modification time
+- `:git` can supply a date from Git history when enabled
+
+Conversion guidance:
+
+- Preserve explicit source fields when they are already concrete and meaningful.
+- If the repository relies on alias or token resolution, do not mistakenly drop related metadata just because the canonical key is absent.
+- If you can deterministically resolve a derived date or slug from the local snapshot and the user wants flattened output, materialize it explicitly.
+- If deterministic resolution would require Git state, build execution, or missing metadata, keep the source field plus a short conversion note instead of guessing.
+
+## Resources Metadata
+
+Front matter may also describe page resources, not just page metadata.
+
+Preserve `resources` metadata when it affects:
+
+- image or file labels
+- resource lookup by `Name`
+- titles used in generated link text
+- custom `params`
+- wildcard-driven assignments
+
+In Hugo's page resource rules, matching order matters and `name` and `title` can use the `:counter` placeholder. Do not simplify these structures away unless the destination explicitly does not need them.
+
 ## Archetype Signal
 
 Read archetypes before normalizing front matter. In the Hugo docs fixture:
@@ -54,6 +94,8 @@ The page file is not always the full source of truth. Also check:
 - generated example source files referenced by local shortcodes
 - render-hook-driven link behavior
 - page bundle resources and section resources
+- page resource metadata from the page's own front matter
+- front matter configuration that changes how dates, slugs, and publish status are derived
 
 ## Literal Examples Versus Live Syntax
 
@@ -97,5 +139,7 @@ Keep these when possible:
 - definition lists if the destination Markdown flavor supports them
 - math passthrough delimiters when the destination supports math
 - block attributes only when the destination flavor supports them
+- heading attributes such as `## Heading {#id .class}`
+- code fence attributes and highlighting options when the destination flavor supports them
 
 If the destination does not support a feature, downgrade explicitly instead of dropping content.

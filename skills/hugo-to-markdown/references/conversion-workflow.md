@@ -11,18 +11,25 @@ Read these in order:
 1. `hugo.toml`, `hugo.yaml`, `hugo.yml`, `hugo.json`, or `config/*`
 2. `archetypes/*`
 3. `data/*`
-4. `layouts/_shortcodes/*` or `layouts/shortcodes/*`
-5. `layouts/_markup/*`
-6. Markdown- or JSON-facing export templates and partials such as `layouts/_default/*.md`, `layouts/_default/*.json`, or `layouts/partials/markdown-*.html`
-7. `content/*`
+4. official or local docs that define shortcode, front matter, bundle, resource, and render-hook behavior
+5. `layouts/_shortcodes/*` or `layouts/shortcodes/*`
+6. `layouts/_markup/*`
+7. Markdown- or JSON-facing export templates and partials such as `layouts/_default/*.md`, `layouts/_default/*.json`, or `layouts/partials/markdown-*.html`
+8. `content/*`
 
 For the Hugo docs fixture in this repository, also read:
 
 1. `testdata/hugo/docs/hugo.toml`
-2. `testdata/hugo/docs/archetypes/*.md`
-3. `testdata/hugo/docs/layouts/_shortcodes/*.html`
-4. `testdata/hugo/docs/layouts/_markup/*.html`
-5. `testdata/hugo/docs/content/en/**/*.md`
+2. `testdata/hugo/docs/content/en/content-management/shortcodes.md`
+3. `testdata/hugo/docs/content/en/configuration/front-matter.md`
+4. `testdata/hugo/docs/content/en/configuration/markup.md`
+5. `testdata/hugo/docs/content/en/content-management/page-bundles.md`
+6. `testdata/hugo/docs/content/en/content-management/page-resources.md`
+7. `testdata/hugo/docs/content/en/content-management/markdown-attributes.md`
+8. `testdata/hugo/docs/archetypes/*.md`
+9. `testdata/hugo/docs/layouts/_shortcodes/*.html`
+10. `testdata/hugo/docs/layouts/_markup/*.html`
+11. `testdata/hugo/docs/content/en/**/*.md`
 
 ## Step 2: Build a site inventory
 
@@ -40,6 +47,7 @@ Inspect the output for:
 - render hook names
 - frequently used shortcodes
 - front matter keys
+- front matter alias or token usage that changes visible dates or slugs
 - whether shortcode usage clusters around content graph expansion, section listings, data-backed tables, or external example extraction
 
 Use the inventory to batch files by complexity:
@@ -47,6 +55,7 @@ Use the inventory to batch files by complexity:
 - plain Markdown only
 - front matter only
 - literal Hugo documentation examples
+- pages with Markdown attributes or code-fence options that must be preserved
 - built-in shortcode usage
 - content-graph shortcodes such as `include`, `embed-md`, `glossary-term`, and `table-children`
 - custom shortcode usage
@@ -90,6 +99,14 @@ When evaluating a shortcode, classify it first:
 
 This classification determines whether you can materialize the output directly, need recursive page resolution, need data-file reads, or must degrade to an explicit note.
 
+Also determine whether the shortcode is:
+
+- embedded, custom, or inline
+- block, self-closing, or dual-form
+- named-argument, positional-argument, or dual-mode
+
+These choices affect how you parse the call and how much of the surrounding Markdown Hugo would have rendered.
+
 ## Step 5: Keep literal Hugo examples literal
 
 The docs site frequently documents Hugo syntax itself. Distinguish:
@@ -120,6 +137,8 @@ Before using front matter to populate generated tables or lists:
 
 - map reserved keys case-insensitively, for example `Title` to `title`
 - treat `linkTitle` and `LinkTitle` as the same logical field
+- account for aliases such as `publishdate` or `modified`
+- account for front matter tokens such as `:filename` and `:fileModTime` when deciding whether metadata is derived
 - preserve unknown custom keys as-is
 
 This prevents empty links and missing descriptions when a repo mixes Hugo key casing conventions.

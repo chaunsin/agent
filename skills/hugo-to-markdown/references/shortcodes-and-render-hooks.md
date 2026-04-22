@@ -14,6 +14,27 @@ Use Hugo's rule, documented in the official shortcode pages:
 
 For conversion, do not preserve this live syntax in the final standard Markdown unless the document is explicitly teaching Hugo syntax.
 
+## Shortcode Calling Rules
+
+Before rewriting a shortcode, determine all of these:
+
+1. embedded, custom, or inline
+2. opening/closing block form, self-closing form, or both
+3. named arguments, positional arguments, or both
+4. whether mixed named and positional arguments are forbidden
+5. whether the shortcode must be called with `%` notation or `<` notation
+
+These are not cosmetic details. They can change visible output, table-of-contents behavior, and whether inner Markdown is rendered at all.
+
+Important Hugo rules from the official shortcode docs:
+
+- inline shortcodes are a separate feature and are disabled unless explicitly enabled
+- some shortcodes require body content, some forbid it, and some support both forms
+- named arguments are case-sensitive
+- named and positional arguments cannot be mixed within one shortcode call
+- multiline arguments and raw string literals are valid shortcode syntax
+- nested shortcodes are allowed except for inline shortcodes
+
 ## First Classify The Shortcode
 
 Before rewriting any shortcode, classify it into one of these groups:
@@ -114,6 +135,48 @@ If the required data source is not locally obvious or requires remarshal logic t
 - the visible inline sample when one exists, or
 - a short note explaining that the repository builds multiple code variants from data at render time
 
+### `datatable`
+
+This shortcode renders a table from `hugo.Data.docs`. Materialize the table from local data when the selected package, list, and field set are clear.
+
+### `per-lang-config-keys` and `root-configuration-keys`
+
+These shortcodes summarize configuration metadata. Treat them as data-backed expanders rather than simple badges or links.
+
+### `syntax-highlighting-styles` and `chroma-lexers`
+
+These shortcodes materialize large generated lists from local data or template logic. Prefer explicit Markdown tables or lists when practical, otherwise downgrade with a clear note describing the omitted generated gallery.
+
+### `newtemplatesystem` and `hl`
+
+These are local presentation helpers. Inspect whether they emit prose, badges, or inline highlighted code before deciding the downgrade format.
+
+## Embedded Shortcodes
+
+The Hugo docs basis also documents embedded shortcodes. Even when the current fixture mostly uses custom shortcodes, the skill should treat these as first-class conversion cases because other Hugo repositories often rely on them directly.
+
+High-value embedded shortcode guidance:
+
+- `details`: convert to a Markdown callout or HTML `<details>` block while preserving the summary text and body content
+- `figure`: preserve the image destination, alt text, caption, title, and attribution semantics; plain Markdown image plus surrounding caption text is usually safer than keeping shortcode syntax
+- `highlight`: convert to fenced code when the rendered result is a code sample; preserve inline highlighting as inline code or HTML only when necessary
+- `param`: resolve to the referenced site parameter if it is locally knowable, otherwise replace with a conversion note
+- `qr`: preserve the encoded text and add a note or image link only if the generated asset is locally resolvable
+- `ref` and `relref`: replace with the final resolved Markdown destination, not the shortcode itself
+- `youtube`, `vimeo`, `instagram`, and `x`: convert to stable normal links or embeds only if the destination is explicit and safe
+
+If a repository overrides an embedded shortcode in `layouts/_shortcodes`, treat the local override as authoritative.
+
+## Inline Shortcodes
+
+Inline shortcodes are rare but important because they can define executable template logic inside content.
+
+Conversion rules:
+
+- If the page is documenting inline shortcode syntax, preserve the example literally.
+- If the page is actually using an inline shortcode and the rendered text is locally obvious, preserve the rendered text rather than the template body.
+- If the rendered value depends on runtime state such as `now`, environment variables, or build context, replace it with an explicit note instead of guessing.
+
 ### `glossary-term` and glossary links
 
 The docs fixture uses glossary shortcuts in two forms:
@@ -122,6 +185,16 @@ The docs fixture uses glossary shortcuts in two forms:
 - Markdown links whose destination is exactly `(g)`
 
 Both should become explicit Markdown links or explicit glossary labels in the output.
+
+### `ref` and `relref`
+
+When these appear as live shortcode calls rather than literal documentation examples:
+
+- resolve them to the final destination
+- preserve query strings and fragments when they are valid
+- do not emit `ref` or `relref` literally in the final Markdown
+
+In the Hugo docs fixture, modern Markdown pages generally prefer render-hook-based destination resolution instead of these shortcodes.
 
 ### Content-graph expanders in non-Hugo fixtures
 
@@ -186,6 +259,14 @@ Important implications:
 - blockquotes can carry alert semantics such as note, tip, important, warning, and caution
 - code blocks can carry file labels, copy flags, details wrappers, summaries, trim behavior, and language remapping
 - passthrough hooks can make math delimiters meaningful content rather than raw noise
+- Markdown attributes can surface in render hook context and therefore must not be stripped blindly
+
+For the Hugo docs fixture specifically:
+
+- the local repository overrides render hooks for blockquotes, code blocks, links, passthrough, and tables
+- it documents heading and image render hooks, but does not override them locally in `layouts/_markup/`
+- the local link hook handles glossary shorthand `(g)`, validates fragments, and checks section resources only when the current page is not a leaf bundle
+- the local code block hook can add file labels, copy buttons, details wrappers, summaries, trim behavior, and language remapping based on code fence attributes
 
 For link-heavy pages, read the local `render-link.html` and the official render-hook docs before rewriting links.
 
