@@ -15,10 +15,10 @@ The SFTP backend can be used with a number of different providers:
 <!-- markdownlint-capture -->
 <!-- markdownlint-disable line-length no-bare-urls -->
 
-{{< provider_list >}}
-{{< provider name="Hetzner Storage Box" home="https://www.hetzner.com/storage/storage-box" config="/sftp/#hetzner-storage-box">}}
-{{< provider name="rsync.net" home="https://rsync.net/products/rclone.html" config="/sftp/#rsync-net">}}
-{{< /provider_list >}}
+| Provider | Configuration |
+|---|---|
+| [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box) | [rclone config](https://rclone.org/sftp/#hetzner-storage-box) |
+| [rsync.net](https://rsync.net/products/rclone.html) | [rclone config](https://rclone.org/sftp/#rsync-net) |
 
 <!-- markdownlint-restore -->
 

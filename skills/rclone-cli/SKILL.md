@@ -243,6 +243,11 @@ rclone cryptcheck crypt:path
 
 For in-depth information, consult these reference files:
 
+These files are converted from the official Hugo-based rclone documentation under
+`testdata/rclone/docs/`. Treat any remaining Hugo shortcode or template syntax
+as a conversion bug: replace it with normal Markdown, a static table, or an
+official URL before relying on it in an answer.
+
 | File | Content | When to read | Official link |
 |------|---------|-------------|---------------|
 | `references/usage.md` | Full usage guide: syntax, config, remote paths, options | Understanding advanced rclone behavior | [Docs](https://rclone.org/docs/) |
@@ -264,7 +269,11 @@ For in-depth information, consult these reference files:
 
 ### Popular Provider References
 
-For configuring specific cloud storage providers, read the corresponding file in `references/providers/`:
+For configuring specific cloud storage providers, read the corresponding file in
+`references/providers/` when present. Some virtual/backing providers, such as
+`crypt`, `cache`, `chunker`, `union`, `combine`, and `hasher`, live as top-level
+files in `references/` because they are cross-provider backends rather than
+single cloud services.
 - `s3.md` — Amazon S3 / compatible ([Official](https://rclone.org/s3/))
 - `drive.md` — Google Drive ([Official](https://rclone.org/drive/))
 - `dropbox.md` — Dropbox ([Official](https://rclone.org/dropbox/))

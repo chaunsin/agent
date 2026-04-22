@@ -289,13 +289,13 @@ using the `crypt` remote. `crypt` uses a similar technique to wrap around
 an existing remote and handles this translation in a seamless way.
 
 There is an issue with wrapping the remotes in this order:
-{{<color red>}}**cloud remote** -> **crypt** -> **cache**{{</color>}}
+**Avoid:** cloud remote -> crypt -> cache
 
 During testing, I experienced a lot of bans with the remotes in this order.
 I suspect it might be related to how crypt opens files on the cloud provider
 which makes it think we're downloading the full file instead of small chunks.
 Organizing the remotes in this order yields better results:
-{{<color green>}}**cloud remote** -> **cache** -> **crypt**{{</color>}}
+**Preferred:** cloud remote -> cache -> crypt
 
 #### absolute remote paths
 

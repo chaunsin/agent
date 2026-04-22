@@ -15,7 +15,68 @@ show through.
 
 Here is an overview of the major features of each cloud storage system.
 
-{{< features-table >}}
+Generated from `testdata/rclone/docs/data/backends/*.yaml` during skill conversion.
+
+| Name | Tier | Hash | ModTime | Case Insensitive | Duplicate Files | MIME Type | Metadata |
+|---|---|---|---|---|---|---|---|
+| [Azure Blob](providers/azureblob.md) | Tier 1 | md5 | R/W | no | no | R/W | RWU |
+| [Azure Files](providers/azurefiles.md) | Tier 2 | md5 | R/W | yes | no | R/W | - |
+| [B2](providers/b2.md) | Tier 1 | sha1 | R/W | no | no | R/W | - |
+| [Box](providers/box.md) | Tier 1 | sha1 | R/W | yes | no | - | - |
+| [Cloudinary](providers/cloudinary.md) | Tier 3 | md5 | R | no | no | - | - |
+| [Doi](https://rclone.org/doi/) | Tier 2 | - | R/W | no | no | - | - |
+| [Drime](providers/drime.md) | Tier 1 | - | R | no | no | R/W | - |
+| [Drive](providers/drive.md) | Tier 1 | md5, sha1, sha256 | DR/W | no | yes | R/W | DRWU |
+| [Dropbox](providers/dropbox.md) | Tier 1 | dropbox | R/W | yes | no | - | - |
+| [Fichier](providers/fichier.md) | Tier 3 | whirlpool | R | no | yes | R | - |
+| [Filefabric](providers/filefabric.md) | Tier 4 | - | R/W | yes | no | R/W | - |
+| [Filelu](providers/filelu.md) | Tier 1 | - | R | no | no | - | - |
+| [Filen](providers/filen.md) | Tier 1 | blake3 | R/W | no | no | R/W | - |
+| [Filescom](providers/filescom.md) | Tier 1 | md5, crc32 | DR/W | yes | no | R | - |
+| [FTP](providers/ftp.md) | Tier 1 | - | R/W | no | no | - | - |
+| [Gofile](providers/gofile.md) | Tier 1 | md5 | DR/W | no | yes | R | - |
+| [Google Cloud Storage](providers/googlecloudstorage.md) | Tier 1 | md5 | R/W | no | no | R/W | - |
+| [Google Photos](providers/googlephotos.md) | Tier 5 | - | R | no | no | R | - |
+| [HDFS](providers/hdfs.md) | Tier 2 | - | R/W | no | no | - | - |
+| [Hidrive](providers/hidrive.md) | Tier 1 | hidrive | R/W | no | no | - | - |
+| [HTTP](providers/http.md) | Tier 3 | - | R/W | no | no | - | R |
+| [Iclouddrive](providers/iclouddrive.md) | Tier 4 | - | R/W | no | no | - | - |
+| [Imagekit](https://rclone.org/imagekit/) | Tier 1 | - | R | no | no | R | R |
+| [Internet Archive](providers/internetarchive.md) | Tier 3 | md5, sha1, crc32 | R/W | no | no | - | RWU |
+| [Internxt](providers/internxt.md) | Tier 2 | - | R | no | no | - | - |
+| [Jottacloud](providers/jottacloud.md) | Tier 2 | md5 | R/W | yes | no | R | RW |
+| [Koofr](providers/koofr.md) | Tier 2 | md5 | R/W | yes | no | - | - |
+| [Linkbox](providers/linkbox.md) | Tier 5 | - | R | yes | no | - | - |
+| [Local](providers/local.md) | Tier 1 | ALL | DR/W | no | no | - | DRWU |
+| [Mailru](providers/mailru.md) | Tier 1 | mailru | R/W | yes | no | - | - |
+| [Mega](providers/mega.md) | Tier 2 | - | R | no | yes | - | - |
+| [Memory](providers/memory.md) | Tier 1 | md5 | R/W | no | no | R/W | - |
+| [Netstorage](providers/netstorage.md) | Tier 1 | md5 | R/W | no | no | - | - |
+| [Onedrive](providers/onedrive.md) | Tier 1 | quickxor | DR/W | yes | no | R | DRW |
+| [Opendrive](providers/opendrive.md) | Tier 1 | md5 | R/W | yes | no | - | - |
+| [Oracle Object Storage](https://rclone.org/oracleobjectstorage/) | Tier 1 | md5 | R/W | no | no | R/W | R |
+| [Pcloud](providers/pcloud.md) | Tier 1 | sha1, sha256 | R/W | no | no | - | - |
+| [Pikpak](providers/pikpak.md) | Tier 1 | md5 | R | no | no | R | - |
+| [Pixeldrain](providers/pixeldrain.md) | Tier 1 | sha256 | DR/W | no | no | R | RW |
+| [Premiumizeme](providers/premiumizeme.md) | Tier 3 | - | R | yes | no | R | - |
+| [Proton Drive](providers/protondrive.md) | Tier 5 | sha1 | R/W | no | no | R | - |
+| [Putio](providers/putio.md) | Tier 2 | crc32 | R/W | no | yes | R | - |
+| [Qingstor](providers/qingstor.md) | Tier 3 | md5 | R | no | no | R/W | - |
+| [Quatrix](providers/quatrix.md) | Tier 3 | - | R/W | no | no | - | - |
+| [S3](providers/s3.md) | Tier 1 | md5 | R/W | no | no | R/W | RWU |
+| [Seafile](providers/seafile.md) | Tier 3 | - | R | no | no | - | - |
+| [SFTP](providers/sftp.md) | Tier 1 | md5, sha1 | DR/W | no | no | - | - |
+| [Shade](providers/shade.md) | Tier 1 | - | R | no | no | - | - |
+| [Sharefile](providers/sharefile.md) | Tier 5 | md5 | R/W | no | no | - | - |
+| [Sia](providers/sia.md) | Tier 4 | - | R | no | no | - | - |
+| [SMB](providers/smb.md) | Tier 2 | - | R/W | yes | no | - | - |
+| [Storj](providers/storj.md) | Tier 1 | - | R/W | no | no | - | - |
+| [Sugarsync](providers/sugarsync.md) | Tier 3 | - | R | yes | no | - | - |
+| [Swift](providers/swift.md) | Tier 1 | md5 | R/W | no | no | R/W | - |
+| [Ulozto](providers/ulozto.md) | Tier 3 | md5, sha256 | R/W | no | yes | - | - |
+| [WebDAV](providers/webdav.md) | Tier 1 | sha1 | R/W | no | no | - | - |
+| [Yandex](providers/yandex.md) | Tier 1 | md5 | R/W | no | no | R | - |
+| [Zoho](providers/zoho.md) | Tier 3 | - | R | no | no | - | - |
 
 ### Hash
 
@@ -411,7 +472,68 @@ See [the metadata docs](/docs/#metadata) for more info.
 All rclone remotes support a base command set. Other features depend
 upon backend-specific capabilities.
 
-{{< optional-features-table >}}
+Generated from `testdata/rclone/docs/data/backends/*.yaml` during skill conversion.
+
+| Name | Purge | Copy | Move | DirMove | CleanUp | ListR | StreamUpload | MultithreadUpload | LinkSharing | About | EmptyDir |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| [Azure Blob](providers/azureblob.md) | yes | yes | no | no | no | yes | yes | yes | no | no | no |
+| [Azure Files](providers/azurefiles.md) | no | yes | yes | yes | no | no | yes | yes | no | yes | yes |
+| [B2](providers/b2.md) | yes | yes | no | no | yes | yes | yes | yes | yes | no | no |
+| [Box](providers/box.md) | yes | yes | yes | yes | yes | no | yes | no | yes | yes | yes |
+| [Cloudinary](providers/cloudinary.md) | no | no | no | no | no | no | no | no | no | no | yes |
+| [Doi](https://rclone.org/doi/) | no | no | no | no | no | no | no | no | no | no | no |
+| [Drime](providers/drime.md) | yes | yes | yes | yes | no | no | yes | yes | no | yes | yes |
+| [Drive](providers/drive.md) | yes | yes | yes | yes | yes | yes | yes | no | yes | yes | yes |
+| [Dropbox](providers/dropbox.md) | yes | yes | yes | yes | no | no | yes | no | yes | yes | yes |
+| [Fichier](providers/fichier.md) | no | yes | yes | yes | no | no | no | no | yes | yes | yes |
+| [Filefabric](providers/filefabric.md) | yes | yes | yes | yes | yes | no | no | no | no | no | yes |
+| [Filelu](providers/filelu.md) | yes | no | yes | no | no | no | no | no | no | yes | yes |
+| [Filen](providers/filen.md) | yes | no | yes | yes | yes | yes | yes | yes | no | yes | yes |
+| [Filescom](providers/filescom.md) | yes | yes | yes | yes | no | no | yes | no | yes | no | yes |
+| [FTP](providers/ftp.md) | no | no | yes | yes | no | no | yes | no | no | no | yes |
+| [Gofile](providers/gofile.md) | yes | yes | yes | yes | no | yes | yes | no | yes | yes | yes |
+| [Google Cloud Storage](providers/googlecloudstorage.md) | no | yes | no | no | no | yes | yes | no | no | no | yes |
+| [Google Photos](providers/googlephotos.md) | no | no | no | no | no | no | no | no | no | no | no |
+| [HDFS](providers/hdfs.md) | yes | no | yes | yes | no | no | yes | no | no | yes | yes |
+| [Hidrive](providers/hidrive.md) | yes | yes | yes | yes | no | no | yes | no | no | no | yes |
+| [HTTP](providers/http.md) | no | no | no | no | no | no | yes | no | no | no | yes |
+| [Iclouddrive](providers/iclouddrive.md) | no | no | no | no | no | no | no | no | no | no | no |
+| [Imagekit](https://rclone.org/imagekit/) | yes | no | no | no | no | no | no | no | yes | no | yes |
+| [Internet Archive](providers/internetarchive.md) | no | yes | no | no | yes | yes | no | no | yes | yes | no |
+| [Internxt](providers/internxt.md) | no | no | no | no | no | no | no | no | no | yes | yes |
+| [Jottacloud](providers/jottacloud.md) | yes | yes | yes | yes | yes | yes | no | no | yes | yes | yes |
+| [Koofr](providers/koofr.md) | no | yes | yes | yes | no | no | yes | no | yes | yes | yes |
+| [Linkbox](providers/linkbox.md) | yes | no | no | no | no | no | no | no | no | no | yes |
+| [Local](providers/local.md) | no | no | yes | yes | no | no | yes | yes | no | yes | yes |
+| [Mailru](providers/mailru.md) | yes | yes | yes | yes | yes | no | no | no | yes | yes | yes |
+| [Mega](providers/mega.md) | yes | no | yes | yes | yes | no | no | no | yes | yes | yes |
+| [Memory](providers/memory.md) | no | yes | no | no | no | yes | yes | no | no | no | no |
+| [Netstorage](providers/netstorage.md) | yes | no | no | no | no | yes | yes | no | no | no | yes |
+| [Onedrive](providers/onedrive.md) | yes | yes | yes | yes | yes | no | no | no | yes | yes | yes |
+| [Opendrive](providers/opendrive.md) | yes | yes | yes | yes | no | no | no | no | no | yes | yes |
+| [Oracle Object Storage](https://rclone.org/oracleobjectstorage/) | no | yes | no | no | yes | yes | yes | yes | no | no | no |
+| [Pcloud](providers/pcloud.md) | yes | yes | yes | yes | no | yes | no | no | yes | yes | yes |
+| [Pikpak](providers/pikpak.md) | yes | yes | yes | yes | yes | no | no | no | yes | yes | yes |
+| [Pixeldrain](providers/pixeldrain.md) | yes | no | yes | yes | no | no | yes | no | yes | yes | yes |
+| [Premiumizeme](providers/premiumizeme.md) | yes | no | yes | yes | no | no | no | no | yes | yes | yes |
+| [Proton Drive](providers/protondrive.md) | yes | no | yes | yes | yes | no | no | no | no | yes | yes |
+| [Putio](providers/putio.md) | yes | yes | yes | yes | yes | no | no | no | no | yes | yes |
+| [Qingstor](providers/qingstor.md) | no | yes | no | no | yes | yes | no | no | no | no | no |
+| [Quatrix](providers/quatrix.md) | yes | yes | yes | yes | no | no | no | no | no | yes | yes |
+| [S3](providers/s3.md) | yes | yes | no | no | yes | yes | yes | yes | yes | no | no |
+| [Seafile](providers/seafile.md) | yes | yes | yes | yes | yes | yes | yes | no | yes | yes | yes |
+| [SFTP](providers/sftp.md) | no | yes | yes | yes | no | no | yes | no | no | yes | yes |
+| [Shade](providers/shade.md) | no | no | yes | yes | no | no | no | yes | no | no | yes |
+| [Sharefile](providers/sharefile.md) | no | no | no | no | no | no | no | no | no | no | no |
+| [Sia](providers/sia.md) | no | no | no | no | no | no | yes | no | no | no | yes |
+| [SMB](providers/smb.md) | no | no | yes | yes | no | no | yes | yes | no | yes | yes |
+| [Storj](providers/storj.md) | yes | yes | yes | no | no | yes | yes | no | yes | no | no |
+| [Sugarsync](providers/sugarsync.md) | yes | yes | yes | yes | no | no | yes | no | yes | no | yes |
+| [Swift](providers/swift.md) | yes | yes | no | no | no | yes | yes | no | no | yes | no |
+| [Ulozto](providers/ulozto.md) | no | no | yes | yes | no | no | no | no | no | yes | yes |
+| [WebDAV](providers/webdav.md) | yes | yes | yes | yes | no | no | no | no | no | yes | yes |
+| [Yandex](providers/yandex.md) | yes | yes | yes | yes | yes | no | yes | no | yes | yes | yes |
+| [Zoho](providers/zoho.md) | yes | yes | yes | yes | no | no | no | no | no | yes | yes |
 
 ### Purge
 

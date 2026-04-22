@@ -16,7 +16,7 @@ This displays a text based user interface allowing the navigation of a
 remote. It is most useful for answering the question - "What is using
 all my disk space?".
 
-{{< asciinema 157793 >}}
+[Official asciinema demo](https://asciinema.org/a/157793)
 
 To make the user interface it first scans the entire remote given and
 builds an in memory representation.  rclone ncdu can be used during
