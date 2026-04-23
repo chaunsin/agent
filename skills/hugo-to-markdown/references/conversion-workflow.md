@@ -17,27 +17,13 @@ Read these in order:
 7. Markdown- or JSON-facing export templates and partials such as `layouts/_default/*.md`, `layouts/_default/*.json`, or `layouts/partials/markdown-*.html`
 8. `content/*`
 
-For the Hugo docs fixture in this repository, also read:
-
-1. `testdata/hugo/docs/hugo.toml`
-2. `testdata/hugo/docs/content/en/content-management/shortcodes.md`
-3. `testdata/hugo/docs/content/en/configuration/front-matter.md`
-4. `testdata/hugo/docs/content/en/configuration/markup.md`
-5. `testdata/hugo/docs/content/en/content-management/page-bundles.md`
-6. `testdata/hugo/docs/content/en/content-management/page-resources.md`
-7. `testdata/hugo/docs/content/en/content-management/markdown-attributes.md`
-8. `testdata/hugo/docs/archetypes/*.md`
-9. `testdata/hugo/docs/layouts/_shortcodes/*.html`
-10. `testdata/hugo/docs/layouts/_markup/*.html`
-11. `testdata/hugo/docs/content/en/**/*.md`
-
 ## Step 2: Build a site inventory
 
 Run:
 
 ```bash
 python3 skills/hugo-to-markdown/scripts/inventory_hugo_rules.py \
-  --site-root testdata/hugo/docs
+  --site-root /path/to/your-hugo-site
 ```
 
 Inspect the output for:

@@ -28,20 +28,16 @@ The target output is standard Markdown:
 
 ## Official Basis
 
-Treat the local Hugo docs snapshot as the primary ruleset for the repository under conversion. For the Hugo docs site in `testdata/hugo/docs/`, the most important rule sources are:
+Treat the repository's own Hugo configuration and templates as the primary ruleset. For any site under conversion, inspect these rule sources in the user's provided site root:
 
-- `content/en/content-management/shortcodes.md`
-- `content/en/templates/shortcode.md`
-- `content/en/configuration/front-matter.md`
-- `content/en/configuration/markup.md`
-- `content/en/content-management/page-bundles.md`
-- `content/en/content-management/page-resources.md`
-- `content/en/content-management/markdown-attributes.md`
-- `content/en/render-hooks/*.md`
-- `hugo.toml`
-- `layouts/_shortcodes/*.html`
-- `layouts/_markup/*.html`
-- `archetypes/*.md`
+- `hugo.toml` (or `hugo.yaml`, `hugo.yml`, `hugo.json`, or `config/*`)
+- `archetypes/*`
+- `data/*`
+- `layouts/_shortcodes/*` or `layouts/shortcodes/*`
+- `layouts/_markup/*`
+- `content/**`
+
+Also read any local docs that define shortcode, front matter, bundle, resource, and render-hook behavior.
 
 Do not assume built-in Hugo defaults if the repository overrides them locally.
 
@@ -55,11 +51,11 @@ Always inspect the site-level rules first.
 python3 scripts/inventory_hugo_rules.py --site-root /path/to/hugo-site
 ```
 
-For the local test fixture in this repository:
+Example invocation for the user's site:
 
 ```bash
 python3 skills/hugo-to-markdown/scripts/inventory_hugo_rules.py \
-  --site-root testdata/hugo/docs
+  --site-root /path/to/your-hugo-site
 ```
 
 This inventory step is mandatory for batch work. It identifies:
@@ -94,7 +90,7 @@ Use these rules by default:
 - Preserve core fields such as `title`, `description`, `date`, `draft`, `aliases`, `slug`, `url`, `weight`, and nested `params` when they still carry meaning.
 - Preserve `publishDate`, `lastmod`, `expiryDate`, and page resource metadata when they still affect meaning or downstream routing.
 - Normalize reserved Hugo front matter keys to their canonical names when the repo mixes casing, for example `Title` to `title`, `Description` to `description`, and `LinkTitle` to `linkTitle`.
-- Account for Hugo front matter aliases and tokens before deciding a field is unused. In the Hugo docs basis this includes aliases such as `pubdate`, `published`, `modified`, and `unpublishdate`, plus tokens such as `:default`, `:filename`, `:fileModTime`, and `:git`.
+- Account for Hugo front matter aliases and tokens before deciding a field is unused. The official Hugo docs recognize aliases such as `pubdate`, `published`, `modified`, and `unpublishdate`, plus tokens such as `:default`, `:filename`, `:fileModTime`, and `:git`.
 - Convert Hugo internal links to normal Markdown links with resolved destinations.
 - Replace Hugo shortcodes with plain Markdown, HTML, or explicit notes only after reading the local shortcode implementation.
 - Preserve or materialize shortcode arguments according to the shortcode's real calling convention. Do not assume every shortcode is named-argument, self-closing, or block-capable.
@@ -104,7 +100,7 @@ Use these rules by default:
 
 ### 4. Apply Hugo-specific body rules carefully
 
-The Hugo docs repository under `testdata/hugo/docs/` has several important local behaviors:
+Many Hugo documentation sites use complex local behaviors. Be alert for these common patterns:
 
 - `hugo.toml` mounts `content/en` to the logical `content` root, so link and include resolution must use Hugo logical paths instead of preserving `/en/` blindly.
 - The docs basis depends on Hugo front matter configuration for date resolution, aliases, and filename-derived metadata; read `configuration/front-matter.md` and `[frontmatter]` in `hugo.toml` before normalizing dates or slugs.
@@ -151,15 +147,15 @@ Use a short, boring format such as:
 
 Do not leave empty links, broken table cells, or stripped content with no explanation.
 
-## Repo-Specific Notes For `testdata/hugo/docs`
+## Common Hugo Docs Site Patterns
 
-Use these facts when the local Hugo docs fixture is the input:
+Use these facts when converting a Hugo documentation site that exhibits similar patterns:
 
 - `hugo.toml` mounts `content/en` to `content`, so English docs are the active content tree.
 - Goldmark passthrough delimiters are configured for math, so `$$...$$`, `\\(...\\)`, and `\\[...\\]` can be meaningful content, not junk.
 - `markup.goldmark.parser.attribute.block = true`, so block attribute syntax may appear after fenced blocks and other block elements.
 - `markup.goldmark.parser.wrapStandAloneImageWithinParagraph = false`, so standalone image attributes can target the image itself rather than a wrapping paragraph.
-- The repo defines custom render hooks for blockquotes, code blocks, links, passthrough, and tables. It documents heading and image render hooks, but this fixture does not override them locally.
+- The repo defines custom render hooks for blockquotes, code blocks, links, passthrough, and tables. It documents heading and image render hooks, but the site does not override them locally.
 - The repo uses many shared `_common` fragments referenced through `% include %`, so reading a page file alone is not enough to understand the rendered content.
 - The repo documents embedded, custom, and inline shortcodes, and the conversion logic must distinguish them before flattening syntax.
 - The repo uses page bundles and page resources heavily in examples and render-hook resolution, including section resources and mounted global resources.

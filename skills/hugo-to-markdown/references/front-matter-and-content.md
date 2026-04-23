@@ -37,7 +37,7 @@ Apply this normalization before using front matter to build lists, tables, or li
 
 Do not treat front matter as a flat key-value copy problem. In Hugo, some visible values are inferred from configuration, aliases, filenames, or Git metadata.
 
-For the Hugo docs basis, check `configuration/front-matter.md` and the local `[frontmatter]` config before deciding which value is authoritative.
+For the source site, check any site-specific front matter documentation and the local `[frontmatter]` config before deciding which value is authoritative.
 
 Important alias rules:
 
@@ -75,7 +75,7 @@ In Hugo's page resource rules, matching order matters and `name` and `title` can
 
 ## Archetype Signal
 
-Read archetypes before normalizing front matter. In the Hugo docs fixture:
+Read archetypes before normalizing front matter. In a typical Hugo docs site:
 
 - `archetypes/default.md` establishes the common fields
 - `archetypes/functions.md` adds nested `params.functions_and_methods`

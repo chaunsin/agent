@@ -55,7 +55,7 @@ This classification should drive the conversion strategy:
 
 ## Docs-Site Custom Shortcodes
 
-The Hugo docs fixture defines these custom shortcodes in `layouts/_shortcodes/`:
+A typical Hugo docs site may define custom shortcodes such as these in `layouts/_shortcodes/`:
 
 - `code-toggle`
 - `datatable`
@@ -86,7 +86,7 @@ If the repository already contains Markdown-export partials or AI-facing templat
 
 ### Logical content paths
 
-The docs fixture mounts `content/en` to Hugo's logical `content` root. Resolve links and `include` targets against logical paths such as `/configuration/markup` or `/_common/permalink-tokens.md`, not filesystem paths that retain `/en/`.
+Some Hugo docs sites mount a language subdirectory such as `content/en` to the logical `content` root. Resolve links and `include` targets against logical paths rather than filesystem paths that retain the language prefix.
 
 ### `include`
 
@@ -124,7 +124,7 @@ Convert these into plain Markdown callouts or inline labels such as:
 
 Preserve the underlying example content as fenced code, not the UI toggle mechanism.
 
-Local implications from the docs fixture:
+Common parameter patterns to watch for:
 
 - `file=hugo` or similar parameters indicate repository-style config examples
 - `fm=true` means the emitted example includes front matter semantics
@@ -153,7 +153,7 @@ These are local presentation helpers. Inspect whether they emit prose, badges, o
 
 ## Embedded Shortcodes
 
-The Hugo docs basis also documents embedded shortcodes. Even when the current fixture mostly uses custom shortcodes, the skill should treat these as first-class conversion cases because other Hugo repositories often rely on them directly.
+The official Hugo docs also document embedded shortcodes. Even when the source site mostly uses custom shortcodes, treat embedded shortcodes as first-class conversion cases because other Hugo repositories often rely on them directly.
 
 High-value embedded shortcode guidance:
 
@@ -179,7 +179,7 @@ Conversion rules:
 
 ### `glossary-term` and glossary links
 
-The docs fixture uses glossary shortcuts in two forms:
+Some Hugo docs sites use glossary shortcuts in two forms:
 
 - `glossary-term` shortcode usage
 - Markdown links whose destination is exactly `(g)`
@@ -194,9 +194,9 @@ When these appear as live shortcode calls rather than literal documentation exam
 - preserve query strings and fragments when they are valid
 - do not emit `ref` or `relref` literally in the final Markdown
 
-In the Hugo docs fixture, modern Markdown pages generally prefer render-hook-based destination resolution instead of these shortcodes.
+In many modern Hugo docs sites, Markdown pages generally prefer render-hook-based destination resolution instead of these shortcodes.
 
-### Content-graph expanders in non-Hugo fixtures
+### Content-graph expanders in other Hugo sites
 
 Other Hugo repos may use shortcodes with similar graph-expansion behavior under different names, for example:
 
@@ -206,9 +206,9 @@ Other Hugo repos may use shortcodes with similar graph-expansion behavior under 
 
 Treat these as repository-specific features. Read the local shortcode or partial implementation before deciding whether it expands sibling pages, child sections, or data files.
 
-### Data-backed and example-extraction shortcodes in non-Hugo fixtures
+### Data-backed and example-extraction shortcodes in other Hugo sites
 
-In docs repos such as Redis or Rclone fixtures, expect shortcodes like:
+In docs repos such as Redis or Rclone sites, expect shortcodes like:
 
 - `features-table`
 - `optional-features-table`
@@ -243,7 +243,7 @@ Do not strip these with a generic shortcode remover.
 
 ## Render Hooks
 
-The local docs site defines render hooks for:
+The site under conversion may define render hooks for:
 
 - blockquotes
 - code blocks
@@ -261,7 +261,7 @@ Important implications:
 - passthrough hooks can make math delimiters meaningful content rather than raw noise
 - Markdown attributes can surface in render hook context and therefore must not be stripped blindly
 
-For the Hugo docs fixture specifically:
+For sites with similar render-hook patterns:
 
 - the local repository overrides render hooks for blockquotes, code blocks, links, passthrough, and tables
 - it documents heading and image render hooks, but does not override them locally in `layouts/_markup/`

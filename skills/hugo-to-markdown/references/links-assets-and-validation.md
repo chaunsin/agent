@@ -4,7 +4,7 @@
 
 Treat link resolution as repository-specific behavior.
 
-For the Hugo docs fixture:
+For a typical Hugo docs site:
 
 - internal links may be plain Markdown destinations
 - `ref` and `relref` appear in docs examples and sometimes in live content
@@ -15,7 +15,7 @@ For the Hugo docs fixture:
 
 ### Resolution Order
 
-For the local Hugo docs `render-link.html`, the effective resolution order is:
+For a custom `render-link.html`, the typical resolution order is:
 
 1. content page
 2. page resource from the current page bundle
@@ -53,7 +53,7 @@ For Hugo repositories, also distinguish:
 - page resources of type `page` versus image, data, document, or video resources
 - resource metadata defined in front matter under `resources`
 
-For this repository's Hugo docs fixture, the link render hook explicitly relies on assets and mounted resources. Read `hugo.toml` and `layouts/_markup/render-link.html` before changing asset paths.
+For sites with custom link render hooks, the hook may explicitly rely on assets and mounted resources. Read `hugo.toml` and `layouts/_markup/render-link.html` before changing asset paths.
 
 ### Bundle-Aware Rules
 
